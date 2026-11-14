@@ -1101,50 +1101,70 @@ $(id).classList.remove("show");
 }
 
 /* ==================================
-3. OPENING CLICKWRAP AGREEMENT
+   OPENING CLICKWRAP AGREEMENT
 ================================== */
 
-const AGREEMENT_VERSION = "2026-11-09-v1";
+document.addEventListener("DOMContentLoaded", () => {
 
-const savedAgreement =
-localStorage.getItem("formaDoppiaAgreement");
+  const AGREEMENT_VERSION = "2026-11-14-v1";
 
-if(savedAgreement === AGREEMENT_VERSION){
-$("agreementScreen").style.display = "none";
-$("websiteContent").classList.remove("hidden");
-document.body.classList.remove("locked");
-}
+  const agreementScreen = document.getElementById("agreementScreen");
+  const websiteContent = document.getElementById("websiteContent");
+  const acceptTerms = document.getElementById("acceptTerms");
+  const acceptPrivacy = document.getElementById("acceptPrivacy");
+  const enterStore = document.getElementById("enterStore");
 
-function checkAgreement(){
-$("enterStore").disabled = !(
-$("acceptTerms").checked &&
-$("acceptPrivacy").checked
-);
-}
+  if (
+    !agreementScreen ||
+    !websiteContent ||
+    !acceptTerms ||
+    !acceptPrivacy ||
+    !enterStore
+  ) {
+    console.error("Agreement error: Missing HTML element.");
+    return;
+  }
 
-$("acceptTerms").addEventListener("change",checkAgreement);
-$("acceptPrivacy").addEventListener("change",checkAgreement);
+  function checkAgreement() {
+    enterStore.disabled = !(
+      acceptTerms.checked &&
+      acceptPrivacy.checked
+    );
+  }
 
-$("enterStore").addEventListener("click",()=>{
-if(!$("acceptTerms").checked ||
-!$("acceptPrivacy").checked){
-return;
-}
+  acceptTerms.addEventListener("change", checkAgreement);
+  acceptPrivacy.addEventListener("change", checkAgreement);
 
-localStorage.setItem(
-"formaDoppiaAgreement",
-AGREEMENT_VERSION
-);
+  const savedAgreement = localStorage.getItem("formaDoppiaAgreement");
 
-localStorage.setItem(
-"formaDoppiaAgreementDate",
-new Date().toISOString()
-);
+  if (savedAgreement === AGREEMENT_VERSION) {
+    agreementScreen.style.display = "none";
+    websiteContent.classList.remove("hidden");
+    document.body.classList.remove("locked");
+  }
 
-$("agreementScreen").style.display = "none";
-$("websiteContent").classList.remove("hidden");
-document.body.classList.remove("locked");
+  checkAgreement();
+
+  enterStore.addEventListener("click", () => {
+
+    if (!acceptTerms.checked || !acceptPrivacy.checked) {
+      return;
+    }
+
+    localStorage.setItem("formaDoppiaAgreement", AGREEMENT_VERSION);
+    localStorage.setItem(
+      "formaDoppiaAgreementDate",
+      new Date().toISOString()
+    );
+
+    agreementScreen.style.display = "none";
+    websiteContent.classList.remove("hidden");
+    document.body.classList.remove("locked");
+
+  });
+
 });
+
 
 /* ==================================
 4. PRODUCT SEARCH AND FILTERS
